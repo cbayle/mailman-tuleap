@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+ARCHIVER_PY="/usr/lib/mailman/Mailman/Archiver/Archiver.py"
+
+install_tuleap_file() {
+    local target="$1"
+    local base=$(basename $target)
+    md5=$(md5sum < ${target}.tuleap | cut -d" " -f 1)
+    if [ -e "/usr/share/mailman-tuleap/$base/$md5" ]; then
+	cp /usr/share/mailman-tuleap/$base/$md5 $target
+    else
+	echo "ERROR: no good substitute file for $target (md5: $md5)" >&2
+	exit 1
+    fi
+}
+
+case "$1" in
+    configure)
+	if [ -z "$2" ]; then
+	    # initial install
+	    dpkg-divert --rename --package mailman-tuleap \
+			--divert ${ARCHIVER_PY}.tuleap $ARCHIVER_PY
+	fi
+	install_tuleap_file $ARCHIVER_PY
+    ;;
+esac
+
+#DEBHELPER#
+

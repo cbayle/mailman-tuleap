@@ -1,0 +1,19 @@
+Source: mailman-tuleap
+Section: mail
+Priority: optional
+Maintainer: Raphaël Hertzog <hertzog@debian.org>
+Build-Depends: debhelper (>= 8)
+Standards-Version: 3.9.3
+Vcs-Git: ssh://gitolite@tuleap.net:tuleap/deps/tuleap/mailman-tuleap.git
+Vcs-Browser: https://tuleap.net/plugins/git/index.php/101/view/12/
+
+Package: mailman-tuleap
+Architecture: all
+Depends: mailman (>= 2.1.14), ${misc:Depends}
+Description: Mailman with Tuleap specific changes
+ This package depends on mailman to get it installed but also diverts
+ one of its files to change the behaviour for better Tuleap integration.
+ .
+ The main change is to accommodate the ForumMML plugin so that the external
+ archiving that it configures doesn't disable the internal archiving made
+ by Mailman.

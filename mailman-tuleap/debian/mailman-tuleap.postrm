@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e 
+
+case "$1" in
+    remove)
+	dpkg-divert --package mailman-tuleap --rename \
+		    --remove /usr/lib/mailman/Mailman/Archiver/Archiver.py || true
+    ;;
+esac
+
+#DEBHELPER#
+
