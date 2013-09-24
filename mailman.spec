@@ -32,6 +32,7 @@ Patch13: mailman-2.1.9-global-address-change.patch
 Patch14: mailman-2.1.9-CVE-2008-0564.patch
 Patch15: mailman-2.1.9-CVE-2010-3089.patch
 Patch16: mailman-2.1.9-CVE-2011-0707.patch
+Patch17: mailman-2.1.9-forumml.patch
 
 License: GPL
 URL: http://www.list.org/
@@ -114,6 +115,7 @@ additional installation steps, these are described in:
 %patch14 -b .CVE-2008-0564
 %patch15 -b .CVE-2010-3089
 %patch16 -b .CVE-2011-0707
+%patch17 -p1 -b .forumml
 
 # Replaces original email-2.5.8.tar.gz with the patched one
 cp %{SOURCE8} misc/email-2.5.8.tar.gz
