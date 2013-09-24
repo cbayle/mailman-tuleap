@@ -1,0 +1,71 @@
+diff -up mailman-2.1.9/Mailman/Queue/Runner.py.backup mailman-2.1.9/Mailman/Queue/Runner.py
+--- mailman-2.1.9/Mailman/Queue/Runner.py.backup	2009-10-20 14:33:03.000000000 +0200
++++ mailman-2.1.9/Mailman/Queue/Runner.py	2009-10-20 14:33:55.000000000 +0200
+@@ -98,7 +98,7 @@ class Runner:
+                 # Ask the switchboard for the message and metadata objects
+                 # associated with this filebase.
+                 msg, msgdata = self._switchboard.dequeue(filebase)
+-            except email.Errors.MessageParseError, e:
++            except Exception, e:
+                 # It's possible to get here if the message was stored in the
+                 # pickle in plain text, and the metadata had a _parsemsg key
+                 # that was true, /and/ if the message had some bogosity in
+@@ -106,7 +106,8 @@ class Runner:
+                 # There's not much we can do (and we didn't even get the
+                 # metadata, so just log the exception and continue.
+                 self._log(e)
+-                syslog('error', 'Ignoring unparseable message: %s', filebase)
++                syslog('error', 'Skipping and preserving unparseable message: %s', filebase)
++                self._switchboard.finish(filebase, preserve=True)
+                 continue
+             try:
+                 self._onefile(msg, msgdata)
+@@ -121,9 +122,14 @@ class Runner:
+                 self._log(e)
+                 # Put a marker in the metadata for unshunting
+                 msgdata['whichq'] = self._switchboard.whichq()
+-                new_filebase = self._shunt.enqueue(msg, msgdata)
+-                syslog('error', 'SHUNTING: %s', new_filebase)
+-                self._switchboard.finish(filebase)
++                try:
++                    new_filebase = self._shunt.enqueue(msg, msgdata)
++                    syslog('error', 'SHUNTING: %s', new_filebase)
++                    self._switchboard.finish(filebase)
++                except Exception, e:
++                    self._log(e)
++                    syslog('error','SHUNTING FAILED, preserving original entry: %s', filebase)
++                    self._switchboard.finish(filebase, preserve=True)
+             # Other work we want to do each time through the loop
+             Utils.reap(self._kids, once=True)
+             self._doperiodic()
+diff -up mailman-2.1.9/Mailman/Queue/Switchboard.py.backup mailman-2.1.9/Mailman/Queue/Switchboard.py
+--- mailman-2.1.9/Mailman/Queue/Switchboard.py.backup	2009-10-20 14:33:22.000000000 +0200
++++ mailman-2.1.9/Mailman/Queue/Switchboard.py	2009-10-20 14:33:48.000000000 +0200
+@@ -164,12 +164,24 @@ class Switchboard:
+             msg = email.message_from_string(msg, Message.Message)
+         return msg, data
+ 
+-    def finish(self, filebase):
++    def finish(self, filebase, preserve=False):
+         bakfile = os.path.join(self.__whichq, filebase + '.bak')
+         try:
+-            os.unlink(bakfile)
++            if preserve:
++                psvfile = os.path.join(mm_cfg.SHUNTQUEUE_DIR, filebase + '.psv')
++                omask = os.umask(0)                       # rwxrws---
++                try:
++                    try:
++                        os.mkdir(mm_cfg.SHUNTQUEUE_DIR, 0770)
++                    except OSError, e:
++                        if e.errno <> errno.EEXIST: raise
++                finally:
++                    os.umask(omask)
++                os.rename(bakfile, psvfile)
++            else:
++                os.unlink(bakfile)
+         except EnvironmentError, e:
+-            syslog('error', 'Failed to unlink backup file: %s', bakfile)
++            syslog('error', 'Failed to unlink/preserve backup file: %s', bakfile)
+ 
+     def files(self, extension='.pck'):
+         times = {}

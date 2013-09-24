@@ -72,19 +72,19 @@ MAILMAN_GID = grp.getgrnam('mailman')[2]
 # If this is not correct for your installation delete the following 5
 # lines that acquire the FQDN and manually edit the hosts instead.
 
-#from socket import *
-#try:
-#    fqdn = getfqdn()
-#except:
-#    fqdn = 'mm_cfg_has_unknown_host_domains'
-#
-#DEFAULT_URL_HOST   = fqdn
-#DEFAULT_EMAIL_HOST = fqdn
+from socket import *
+try:
+    fqdn = getfqdn()
+except:
+    fqdn = 'mm_cfg_has_unknown_host_domains'
+
+DEFAULT_URL_HOST   = fqdn
+DEFAULT_EMAIL_HOST = fqdn
 
 # Because we've overriden the virtual hosts above add_virtualhost
 # MUST be called after they have been defined.
 
-#add_virtualhost(DEFAULT_URL_HOST, DEFAULT_EMAIL_HOST)
+add_virtualhost(DEFAULT_URL_HOST, DEFAULT_EMAIL_HOST)
 
 
 ##############################################################
@@ -93,5 +93,3 @@ MAILMAN_GID = grp.getgrnam('mailman')[2]
 
 # Note - if you're looking for something that is imported from mm_cfg, but you
 # didn't find it above, it's probably in Defaults.py.
-
-
