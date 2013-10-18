@@ -93,3 +93,7 @@ add_virtualhost(DEFAULT_URL_HOST, DEFAULT_EMAIL_HOST)
 
 # Note - if you're looking for something that is imported from mm_cfg, but you
 # didn't find it above, it's probably in Defaults.py.
+
+# Limit number of users in mailing lists.
+# Possible values: integer or 'false'
+LIST_MEMBER_MAX = 'false'

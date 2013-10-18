@@ -4,7 +4,7 @@
 Summary: Mailing list manager with built in Web access.
 Name: mailman-%{PKG_NAME}
 Version: 2.1.9
-Release: 7%{?dist}.1
+Release: 7%{?dist}.2
 Epoch: 3
 Provides: %{APP_NAME}
 Group: Applications/Internet
@@ -37,6 +37,7 @@ Patch14: mailman-2.1.9-CVE-2008-0564.patch
 Patch15: mailman-2.1.9-CVE-2010-3089.patch
 Patch16: mailman-2.1.9-CVE-2011-0707.patch
 Patch17: mailman-2.1.9-forumml.patch
+Patch18: mailman-2.1.9-max-member-limit.patch
 
 License: GPL
 URL: http://www.list.org/
@@ -121,6 +122,7 @@ additional installation steps, these are described in:
 %patch15 -b .CVE-2010-3089
 %patch16 -b .CVE-2011-0707
 %patch17 -p1 -b .forumml
+%patch18 -p1 -b .max-member-limit
 
 # Replaces original email-2.5.8.tar.gz with the patched one
 cp %{SOURCE8} misc/email-2.5.8.tar.gz
@@ -356,6 +358,9 @@ exit 0
 %attr(0644,root,%{mmgroup}) %config(noreplace) %{mmdir}/cron/crontab.in
 
 %changelog
+* Fri Oct 18 2013 Dylan <dylan.bowden@enalean.com> - 3:2.1.9-7.2
+- Add patch to limit number of members on a mailing list
+
 * Tue Sep 24 2013 Manuel Vacelet <manuel.vacelet@enalean.com> - 3:2.1.9-7.1
 - Bump forumml + rename patches
 

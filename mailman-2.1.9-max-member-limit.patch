@@ -1,0 +1,27 @@
+--- mailman-old/Mailman/Cgi/admin.py	2006-08-30 16:54:22.000000000 +0200
++++ mailman-2.1.9/Mailman/Cgi/admin.py	2013-10-17 16:43:36.000000000 +0200
+@@ -1131,6 +1131,7 @@
+     # MASS SUBSCRIBE
+     GREY = mm_cfg.WEB_ADMINITEM_COLOR
+     table = Table(width='90%')
++    table.AddRow([Italic(_("There are " + str(len(mlist.members)) + " members in this list."))])
+     table.AddRow([
+         Label(_('Subscribe these users now or invite them?')),
+         RadioButtonArray('subscribe_or_invite',
+@@ -1317,6 +1318,16 @@
+         # should limit the number of "Successfully subscribed" status messages
+         # we display.  Try uploading a file with 10k names -- it takes a while
+         # to render the status page.
++        # First, check if a maximum number of list members is set.
++        # If number of entries exceeds set limit, do not allow to add.
++        try:
++            mm_cfg.LIST_MEMBER_MAX
++        except AttributeError:
++            mm_cfg.LIST_MEMBER_MAX = 'false'
++        if (len(mlist.members) + len(entries)) > mm_cfg.LIST_MEMBER_MAX:
++            subscribe_errors.append((('Maximum membership capacity of ' + str(mm_cfg.LIST_MEMBER_MAX) + ' exceeded'),
++                ('Current total: ' + str(len(mlist.members)) + '. Attempted to add: ' + str(len(entries)))))
++            del entries[:]
+         for entry in entries:
+             safeentry = Utils.websafe(entry)
+             fullname, address = parseaddr(entry)
